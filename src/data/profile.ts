@@ -334,6 +334,17 @@ export const profile: Profile = {
       url: 'https://fwdays.com/event/fwdays-ai-summit',
     },
     {
+      // Year inferred as 2026 (no year given) — this list is otherwise all
+      // past events, and Mar 2026 is the only reading consistent with that
+      // and with today's date. Confirm/correct if wrong.
+      title: 'Agentic IDEs for Large, Brownfield & Legacy Codebases Course',
+      type: 'course',
+      location: 'Online',
+      date: 'Mar 26, 2026',
+      sortDate: '2026-03-26',
+      url: 'https://fwdays.com/en/event/rules-ide-course',
+    },
+    {
       title: "Software Architecture fwdays'25",
       type: 'conference',
       location: 'Kyiv',
