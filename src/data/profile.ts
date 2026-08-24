@@ -36,12 +36,15 @@ export interface Language {
   level: string;
 }
 
-export interface TalkOrArticle {
+export interface CommunityEvent {
   title: string;
-  type: 'talk' | 'article' | 'podcast' | 'other';
-  venue?: string;
-  /** YYYY or YYYY-MM */
+  /** 'talk'/'article'/'podcast' = the owner presented/wrote it. 'conference'/'course' = attended, not presented. */
+  type: 'talk' | 'article' | 'podcast' | 'conference' | 'course' | 'other';
+  location?: string;
+  /** Human-readable date or date range, e.g. "Sep 20, 2025" or "Nov 18 – Dec 7, 2024". */
   date?: string;
+  /** ISO date used only for sort order; not displayed. */
+  sortDate: string;
   url?: string;
   description?: string;
 }
@@ -70,8 +73,8 @@ export interface Profile {
   /** Newest first. */
   experience: ExperienceEntry[];
   education: EducationEntry[];
-  /** Newest first. Talks, conference sessions, external articles, podcasts. */
-  talks: TalkOrArticle[];
+  /** Talks given, articles written, and conferences/courses attended. Any order — sorted by sortDate at render time. */
+  communityEvents: CommunityEvent[];
 }
 
 export const profile: Profile = {
@@ -319,7 +322,80 @@ export const profile: Profile = {
       endDate: '2005',
     },
   ],
-  // No talks or external articles supplied yet — the page renders a clean
-  // empty state until real entries are added here.
-  talks: [],
+  // Conferences and courses attended, not presented — see the `type` field
+  // on CommunityEvent. Add real talks/articles here too when there are any.
+  communityEvents: [
+    {
+      title: 'Fwdays AI Summit',
+      type: 'conference',
+      location: 'Kyiv',
+      date: 'Apr 25, 2026',
+      sortDate: '2026-04-25',
+      url: 'https://fwdays.com/event/fwdays-ai-summit',
+    },
+    {
+      title: "Software Architecture fwdays'25",
+      type: 'conference',
+      location: 'Kyiv',
+      date: 'Sep 20, 2025',
+      sortDate: '2025-09-20',
+      url: 'https://fwdays.com/event/architecture-fwdays-2025',
+    },
+    {
+      title: 'Software Architecture Design Course',
+      type: 'course',
+      location: 'Online',
+      date: 'Nov 18 – Dec 7, 2024',
+      sortDate: '2024-11-18',
+      url: 'https://fwdays.com/event/software-architecture-design-course',
+    },
+    {
+      title: "Software Architecture fwdays'24",
+      type: 'conference',
+      location: 'Kyiv',
+      date: 'Sep 14, 2024',
+      sortDate: '2024-09-14',
+      url: 'https://fwdays.com/event/architecture-fwdays-2024',
+    },
+    {
+      title: "Software Architecture fwdays'23",
+      type: 'conference',
+      location: 'Kyiv',
+      date: 'Sep 19 & 23, 2023',
+      sortDate: '2023-09-19',
+      url: 'https://fwdays.com/event/architecture-fwdays-2023',
+    },
+    {
+      title: ".NET fwdays'22",
+      type: 'conference',
+      location: 'Online',
+      date: 'Oct 15 & 17, 2022',
+      sortDate: '2022-10-15',
+      url: 'https://fwdays.com/event/dotnet-fwdays-2022',
+    },
+    {
+      title: "Software Architecture fwdays'22",
+      type: 'conference',
+      location: 'Online',
+      date: 'Sep 24, 2022',
+      sortDate: '2022-09-24',
+      url: 'https://fwdays.com/event/architecture-fwdays-2022',
+    },
+    {
+      title: "Software Architecture fwdays'21",
+      type: 'conference',
+      location: 'Online',
+      date: 'Oct 27 – Nov 12, 2021',
+      sortDate: '2021-10-27',
+      url: 'https://fwdays.com/event/architecture-fwdays-2021',
+    },
+    {
+      title: ".NET fwdays'21",
+      type: 'conference',
+      location: 'Online',
+      date: 'Aug 3–12, 2021',
+      sortDate: '2021-08-03',
+      url: 'https://fwdays.com/event/dotnet-fwdays-2021',
+    },
+  ],
 };

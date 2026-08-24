@@ -6,38 +6,33 @@ const typeLabels: Record<string, string> = {
   talk: 'Talk',
   article: 'Article',
   podcast: 'Podcast',
-  other: 'Writing',
+  conference: 'Attended',
+  course: 'Course',
+  other: 'Other',
 };
 
-function formatDate(value?: string): string {
-  if (!value) return '';
-  const [year, month] = value.split('-');
-  if (!month) return year;
-  const date = new Date(Number(year), Number(month) - 1);
-  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-}
-
-const sorted = [...profile.talks].sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
+const sorted = [...profile.communityEvents].sort((a, b) => b.sortDate.localeCompare(a.sortDate));
 ---
 
 <BaseLayout
-  title={`Talks & Writing — ${profile.name}`}
-  description={`Conference talks, external articles, and other writing by ${profile.name}.`}
+  title={`Community & Learning — ${profile.name}`}
+  description={`Conferences, courses, and talks ${profile.name} has been part of.`}
 >
   <div class="container prose" style="padding-block: var(--space-6);">
-    <h1>Talks & Writing</h1>
+    <h1>Community & Learning</h1>
+    <p>
+      Conferences and courses I've taken part in, plus any talks or writing beyond the{' '}
+      <a href="/blog">blog</a>.
+    </p>
 
     {
       sorted.length === 0 ? (
-        <p class="talks-empty">
-          Nothing published here yet — check the <a href="/blog">blog</a> for shorter, regularly
-          updated writing in the meantime.
-        </p>
+        <p class="events-empty">Nothing to show here yet.</p>
       ) : (
-        <ul class="talks-list">
+        <ul class="events-list">
           {sorted.map((item) => (
             <li>
-              <span class="talks-list__type">{typeLabels[item.type]}</span>
+              <span class="events-list__type">{typeLabels[item.type]}</span>
               <h2>
                 {item.url ? (
                   <a href={item.url} target="_blank" rel="noopener noreferrer">
@@ -47,10 +42,10 @@ const sorted = [...profile.talks].sort((a, b) => (b.date ?? '').localeCompare(a.
                   item.title
                 )}
               </h2>
-              <p class="talks-list__meta">
-                {item.venue}
-                {item.venue && item.date && ' · '}
-                {formatDate(item.date)}
+              <p class="events-list__meta">
+                {item.location}
+                {item.location && item.date && ' · '}
+                {item.date}
               </p>
               {item.description && <p>{item.description}</p>}
             </li>
@@ -62,27 +57,28 @@ const sorted = [...profile.talks].sort((a, b) => (b.date ?? '').localeCompare(a.
 </BaseLayout>
 
 <style>
-  .talks-empty {
+  .events-empty {
     color: var(--color-text-muted);
     padding-block: var(--space-4);
   }
 
-  .talks-list {
+  .events-list {
     list-style: none;
     padding: 0;
     margin: 0;
   }
 
-  .talks-list li {
+  .events-list li {
     padding-block: var(--space-4);
     border-bottom: 1px solid var(--color-border);
   }
 
-  .talks-list h2 {
+  .events-list h2 {
     margin: var(--space-1) 0;
+    font-size: 1.1rem;
   }
 
-  .talks-list__type {
+  .events-list__type {
     display: inline-block;
     background: var(--color-bg-subtle);
     border: 1px solid var(--color-border);
@@ -95,7 +91,7 @@ const sorted = [...profile.talks].sort((a, b) => (b.date ?? '').localeCompare(a.
     color: var(--color-text-muted);
   }
 
-  .talks-list__meta {
+  .events-list__meta {
     color: var(--color-text-muted);
     font-size: 0.9rem;
     margin: 0 0 var(--space-2);
