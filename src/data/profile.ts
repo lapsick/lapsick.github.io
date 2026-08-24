@@ -326,6 +326,14 @@ export const profile: Profile = {
   // on CommunityEvent. Add real talks/articles here too when there are any.
   communityEvents: [
     {
+      // No city/mode given — left unset rather than guessed.
+      title: 'Fwdays Tech Summit',
+      type: 'conference',
+      date: 'Oct 3, 2026',
+      sortDate: '2026-10-03',
+      url: 'https://fwdays.com/en/event/tech-summit-26',
+    },
+    {
       // No city given — inferred Online, consistent with the other fwdays
       // course entry. Confirm/correct if this one is in-person.
       title: 'Crash Course: Agentic Engineering',
