@@ -326,12 +326,22 @@ export const profile: Profile = {
   // on CommunityEvent. Add real talks/articles here too when there are any.
   communityEvents: [
     {
+      // No city given — inferred Online, consistent with the other fwdays
+      // course entry. Confirm/correct if this one is in-person.
+      title: 'Crash Course: Agentic Engineering',
+      type: 'course',
+      location: 'Online',
+      date: 'Sep 8–24, 2026',
+      sortDate: '2026-09-08',
+      url: 'https://fwdays.com/en/event/agentic-engineering-course',
+    },
+    {
       title: 'Fwdays AI Summit',
       type: 'conference',
       location: 'Kyiv',
       date: 'Apr 25, 2026',
       sortDate: '2026-04-25',
-      url: 'https://fwdays.com/event/fwdays-ai-summit',
+      url: 'https://fwdays.com/en/event/fwdays-ai-summit',
     },
     {
       // Year inferred as 2026 (no year given) — this list is otherwise all
@@ -350,7 +360,7 @@ export const profile: Profile = {
       location: 'Kyiv',
       date: 'Sep 20, 2025',
       sortDate: '2025-09-20',
-      url: 'https://fwdays.com/event/architecture-fwdays-2025',
+      url: 'https://fwdays.com/en/event/architecture-fwdays-2025',
     },
     {
       title: 'Software Architecture Design Course',
@@ -358,7 +368,7 @@ export const profile: Profile = {
       location: 'Online',
       date: 'Nov 18 – Dec 7, 2024',
       sortDate: '2024-11-18',
-      url: 'https://fwdays.com/event/software-architecture-design-course',
+      url: 'https://fwdays.com/en/event/software-architecture-design-course',
     },
     {
       title: "Software Architecture fwdays'24",
@@ -366,7 +376,7 @@ export const profile: Profile = {
       location: 'Kyiv',
       date: 'Sep 14, 2024',
       sortDate: '2024-09-14',
-      url: 'https://fwdays.com/event/architecture-fwdays-2024',
+      url: 'https://fwdays.com/en/event/architecture-fwdays-2024',
     },
     {
       title: "Software Architecture fwdays'23",
@@ -374,7 +384,7 @@ export const profile: Profile = {
       location: 'Kyiv',
       date: 'Sep 19 & 23, 2023',
       sortDate: '2023-09-19',
-      url: 'https://fwdays.com/event/architecture-fwdays-2023',
+      url: 'https://fwdays.com/en/event/architecture-fwdays-2023',
     },
     {
       title: ".NET fwdays'22",
@@ -382,7 +392,7 @@ export const profile: Profile = {
       location: 'Online',
       date: 'Oct 15 & 17, 2022',
       sortDate: '2022-10-15',
-      url: 'https://fwdays.com/event/dotnet-fwdays-2022',
+      url: 'https://fwdays.com/en/event/dotnet-fwdays-2022',
     },
     {
       title: "Software Architecture fwdays'22",
@@ -390,7 +400,7 @@ export const profile: Profile = {
       location: 'Online',
       date: 'Sep 24, 2022',
       sortDate: '2022-09-24',
-      url: 'https://fwdays.com/event/architecture-fwdays-2022',
+      url: 'https://fwdays.com/en/event/architecture-fwdays-2022',
     },
     {
       title: "Software Architecture fwdays'21",
@@ -398,7 +408,7 @@ export const profile: Profile = {
       location: 'Online',
       date: 'Oct 27 – Nov 12, 2021',
       sortDate: '2021-10-27',
-      url: 'https://fwdays.com/event/architecture-fwdays-2021',
+      url: 'https://fwdays.com/en/event/architecture-fwdays-2021',
     },
     {
       title: ".NET fwdays'21",
@@ -406,7 +416,7 @@ export const profile: Profile = {
       location: 'Online',
       date: 'Aug 3–12, 2021',
       sortDate: '2021-08-03',
-      url: 'https://fwdays.com/event/dotnet-fwdays-2021',
+      url: 'https://fwdays.com/en/event/dotnet-fwdays-2021',
     },
   ],
 };
