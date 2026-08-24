@@ -1,0 +1,98 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ExperienceItem from '../components/ExperienceItem.astro';
+import { profile } from '../data/profile';
+---
+
+<BaseLayout
+  title={`Résumé — ${profile.name}`}
+  description={`Downloadable résumé and career summary for ${profile.name}, ${profile.title}.`}
+>
+  <div class="container prose" style="padding-block: var(--space-6);">
+    <h1>Résumé</h1>
+    {
+      profile.resumePdf && (
+        <p>
+          <a class="button button--primary" href={profile.resumePdf} download>
+            Download résumé (PDF)
+          </a>
+        </p>
+      )
+    }
+
+    <h2>Summary</h2>
+    <p>{profile.about}</p>
+
+    <h2>Technical skills</h2>
+    <dl class="skill-categories">
+      {
+        profile.skillCategories.map((category) => (
+          <div class="skill-category">
+            <dt>{category.name}</dt>
+            <dd>{category.skills.join(' · ')}</dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <h2>Experience</h2>
+    <div>
+      {profile.experience.map((entry) => <ExperienceItem entry={entry} />)}
+    </div>
+
+    <h2>Education</h2>
+    <ul>
+      {
+        profile.education.map((edu) => (
+          <li>
+            <strong>{edu.qualification}</strong> — {edu.institution} ({edu.endDate})
+          </li>
+        ))
+      }
+    </ul>
+
+    {
+      profile.languages.length > 0 && (
+        <>
+          <h2>Languages</h2>
+          <p>
+            {profile.languages.map((lang, i) => (
+              <>
+                {i > 0 && ' · '}
+                {lang.name} — {lang.level}
+              </>
+            ))}
+          </p>
+        </>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .button--primary {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius);
+    background: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent-contrast);
+    text-decoration: none;
+  }
+
+  .skill-categories {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+  }
+
+  .skill-category dt {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .skill-category dd {
+    margin: var(--space-1) 0 0;
+    color: var(--color-text-muted);
+  }
+</style>

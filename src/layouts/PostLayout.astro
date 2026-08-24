@@ -1,0 +1,48 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import TagList from '../components/TagList.astro';
+import type { Post } from '../lib/posts';
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const { title, summary, publishDate, updatedDate, tags, coverImage } = post.data;
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+---
+
+<BaseLayout title={`${title} — Blog`} description={summary} ogImage={coverImage} ogType="article">
+  <article class="container prose post" style="padding-block: var(--space-6);">
+    <header class="post__header">
+      <h1>{title}</h1>
+      <p class="post__meta">
+        <time datetime={publishDate.toISOString()}>{formatDate(publishDate)}</time>
+        {updatedDate && <> · Updated <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time></>}
+      </p>
+      {tags.length > 0 && <TagList tags={tags} />}
+    </header>
+
+    <div class="post__body">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .post__header {
+    margin-bottom: var(--space-5);
+  }
+
+  .post__meta {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+
+  .post__body :global(pre) {
+    overflow-x: auto;
+  }
+</style>

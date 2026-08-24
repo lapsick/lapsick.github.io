@@ -1,0 +1,215 @@
+---
+interface Props {
+  values?: { name?: string; email?: string; company?: string; message?: string };
+  errors?: Partial<Record<'name' | 'email' | 'company' | 'message', string>>;
+  submitFailed?: boolean;
+  fallbackEmail?: string;
+}
+
+const { values = {}, errors = {}, submitFailed = false, fallbackEmail } = Astro.props;
+const renderedAt = Date.now();
+---
+
+<form method="post" action="/api/contact" novalidate class="contact-form" id="contact-form">
+  {
+    submitFailed && (
+      <p class="form-status form-status--error" role="alert">
+        We couldn't send your message.
+        {fallbackEmail && (
+          <>
+            {' '}
+            Please email <a href={`mailto:${fallbackEmail}`}>{fallbackEmail}</a> directly.
+          </>
+        )}
+      </p>
+    )
+  }
+
+  <div class="field">
+    <label for="name">Name</label>
+    <input
+      type="text"
+      id="name"
+      name="name"
+      value={values.name ?? ''}
+      required
+      maxlength="100"
+      aria-describedby={errors.name ? 'name-error' : undefined}
+      aria-invalid={errors.name ? 'true' : undefined}
+    />
+    {errors.name && <p id="name-error" class="field-error">{errors.name}</p>}
+  </div>
+
+  <div class="field">
+    <label for="email">Email</label>
+    <input
+      type="email"
+      id="email"
+      name="email"
+      value={values.email ?? ''}
+      required
+      maxlength="254"
+      aria-describedby={errors.email ? 'email-error' : undefined}
+      aria-invalid={errors.email ? 'true' : undefined}
+    />
+    {errors.email && <p id="email-error" class="field-error">{errors.email}</p>}
+  </div>
+
+  <div class="field">
+    <label for="company">Company <span class="field-optional">(optional)</span></label>
+    <input
+      type="text"
+      id="company"
+      name="company"
+      value={values.company ?? ''}
+      maxlength="100"
+      aria-describedby={errors.company ? 'company-error' : undefined}
+      aria-invalid={errors.company ? 'true' : undefined}
+    />
+    {errors.company && <p id="company-error" class="field-error">{errors.company}</p>}
+  </div>
+
+  <div class="field">
+    <label for="message">Message</label>
+    <textarea
+      id="message"
+      name="message"
+      rows="6"
+      required
+      maxlength="5000"
+      aria-describedby={errors.message ? 'message-error' : undefined}
+      aria-invalid={errors.message ? 'true' : undefined}
+    >{values.message ?? ''}</textarea>
+    {errors.message && <p id="message-error" class="field-error">{errors.message}</p>}
+  </div>
+
+  <!-- Honeypot: hidden from sighted users and from assistive technology. Real
+       visitors never fill this in; anything present here is treated as spam. -->
+  <div class="field field--honeypot" aria-hidden="true">
+    <label for="_hp">Leave this field empty</label>
+    <input type="text" id="_hp" name="_hp" tabindex="-1" autocomplete="off" />
+  </div>
+  <input type="hidden" name="_t" value={renderedAt} />
+
+  <button type="submit" class="button button--primary">Send message</button>
+</form>
+
+<p class="contact-form__privacy">
+  Submitting this form sends your message directly to the site owner by email. Nothing you enter
+  is stored on this site.
+</p>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  if (form) {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const payload = Object.fromEntries(formData.entries());
+
+      let statusEl = form.querySelector<HTMLElement>('.form-status');
+      statusEl?.remove();
+      form.querySelectorAll('.field-error').forEach((el) => el.remove());
+
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+
+        if (res.ok && data.ok) {
+          form.outerHTML =
+            '<p class="form-status form-status--success" role="status">Thanks — your message has been sent.</p>';
+          return;
+        }
+
+        if (res.status === 400 && data.errors) {
+          for (const [field, msg] of Object.entries<string>(data.errors)) {
+            const input = form.querySelector(`[name="${field}"]`);
+            if (input) {
+              const p = document.createElement('p');
+              p.className = 'field-error';
+              p.textContent = msg;
+              input.insertAdjacentElement('afterend', p);
+            }
+          }
+          return;
+        }
+
+        const p = document.createElement('p');
+        p.className = 'form-status form-status--error';
+        p.setAttribute('role', 'alert');
+        p.textContent =
+          data.message ||
+          "We couldn't send your message. Please try again or email us directly.";
+        form.insertAdjacentElement('beforebegin', p);
+      } catch {
+        const p = document.createElement('p');
+        p.className = 'form-status form-status--error';
+        p.setAttribute('role', 'alert');
+        p.textContent = "We couldn't send your message. Please try again or email us directly.";
+        form.insertAdjacentElement('beforebegin', p);
+      }
+    });
+  }
+</script>
+
+<style>
+  .contact-form {
+    display: grid;
+    gap: var(--space-4);
+    max-width: var(--measure);
+  }
+
+  .field {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .field label {
+    font-weight: 600;
+  }
+
+  .field-optional {
+    font-weight: 400;
+    color: var(--color-text-muted);
+  }
+
+  .field input,
+  .field textarea {
+    padding: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font: inherit;
+  }
+
+  .field--honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .contact-form__privacy {
+    max-width: var(--measure);
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    margin-top: var(--space-3);
+  }
+
+  .button--primary {
+    justify-self: start;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius);
+    background: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent-contrast);
+    font: inherit;
+    cursor: pointer;
+  }
+</style>

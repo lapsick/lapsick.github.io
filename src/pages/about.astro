@@ -1,0 +1,157 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ExperienceItem from '../components/ExperienceItem.astro';
+import { profile } from '../data/profile';
+---
+
+<BaseLayout
+  title={`About — ${profile.name}`}
+  description={`Professional experience, education, and skills for ${profile.name}, ${profile.title}.`}
+>
+  <div class="container prose" style="padding-block: var(--space-6);">
+    <h1>About</h1>
+    <p>{profile.about}</p>
+
+    {
+      profile.focusAreas.length > 0 && (
+        <>
+          <h2>Focus areas</h2>
+          <ul class="focus-areas">
+            {profile.focusAreas.map((area) => (
+              <li>
+                <strong>{area.title}</strong> — {area.description}
+              </li>
+            ))}
+          </ul>
+        </>
+      )
+    }
+
+    <h2>Experience</h2>
+    <div>
+      {profile.experience.map((entry) => <ExperienceItem entry={entry} />)}
+    </div>
+
+    <h2>Education</h2>
+    <ul>
+      {
+        profile.education.map((edu) => (
+          <li>
+            <strong>{edu.qualification}</strong> — {edu.institution}
+            {edu.endDate && <> ({edu.startDate ? `${edu.startDate}–` : ''}{edu.endDate})</>}
+            {edu.credentialUrl && (
+              <>
+                {' '}
+                <a href={edu.credentialUrl} target="_blank" rel="noopener noreferrer">
+                  View credential
+                </a>
+              </>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+
+    {
+      profile.languages.length > 0 && (
+        <>
+          <h2>Languages</h2>
+          <p>
+            {profile.languages.map((lang, i) => (
+              <>
+                {i > 0 && ' · '}
+                {lang.name} — {lang.level}
+              </>
+            ))}
+          </p>
+        </>
+      )
+    }
+
+    <h2>Skills</h2>
+    <ul class="skills-list">
+      {profile.skills.map((skill) => <li>{skill}</li>)}
+    </ul>
+
+    {
+      profile.skillCategories.length > 0 && (
+        <>
+          <h2>Technical skills</h2>
+          <dl class="skill-categories">
+            {profile.skillCategories.map((category) => (
+              <div class="skill-category">
+                <dt>{category.name}</dt>
+                <dd>{category.skills.join(' · ')}</dd>
+              </div>
+            ))}
+          </dl>
+        </>
+      )
+    }
+
+    {
+      profile.photo && (
+        <img
+          class="about-photo"
+          src={profile.photo}
+          alt={profile.photoAlt ?? ''}
+          width="320"
+          height="320"
+          loading="lazy"
+        />
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .focus-areas {
+    padding-left: 1.25rem;
+  }
+
+  .focus-areas li {
+    margin-bottom: var(--space-2);
+  }
+
+  .skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    list-style: none;
+    padding: 0;
+  }
+
+  .skills-list li {
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: var(--space-1) var(--space-3);
+    font-size: 0.875rem;
+  }
+
+  .skill-categories {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+  }
+
+  .skill-category dt {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .skill-category dd {
+    margin: var(--space-1) 0 0;
+    color: var(--color-text-muted);
+  }
+
+  .about-photo {
+    margin-top: var(--space-6);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+</style>

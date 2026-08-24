@@ -1,0 +1,66 @@
+---
+import type { ExperienceEntry } from '../data/profile';
+
+interface Props {
+  entry: ExperienceEntry;
+}
+
+const { entry } = Astro.props;
+
+function formatDate(value: string): string {
+  const [year, month] = value.split('-');
+  if (!month) return year;
+  const date = new Date(Number(year), Number(month) - 1);
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+
+const endLabel = entry.endDate === 'present' ? 'Present' : formatDate(entry.endDate);
+---
+
+<article class="experience-item">
+  <header class="experience-item__header">
+    <h3>{entry.role}</h3>
+    <p class="experience-item__meta">
+      {entry.company}
+      {entry.location && <> &middot; {entry.location}</>}
+    </p>
+    <p class="experience-item__dates">
+      {formatDate(entry.startDate)} – {endLabel}
+    </p>
+  </header>
+  <ul>
+    {entry.highlights.map((highlight) => <li>{highlight}</li>)}
+  </ul>
+  {
+    entry.technologies && entry.technologies.length > 0 && (
+      <p class="experience-item__tech">{entry.technologies.join(' · ')}</p>
+    )
+  }
+</article>
+
+<style>
+  .experience-item {
+    padding-block: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .experience-item__header h3 {
+    margin-bottom: var(--space-1);
+  }
+
+  .experience-item__meta,
+  .experience-item__dates {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  .experience-item__dates {
+    font-size: 0.9rem;
+    margin-bottom: var(--space-2);
+  }
+
+  .experience-item__tech {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+</style>

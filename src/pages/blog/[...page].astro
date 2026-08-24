@@ -1,0 +1,47 @@
+---
+import type { GetStaticPathsOptions } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPublishedPosts } from '../../lib/posts';
+
+export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
+  const posts = await getPublishedPosts();
+  return paginate(posts, { pageSize: 10 });
+}
+
+const { page } = Astro.props;
+---
+
+<BaseLayout title="Blog" description="Articles on software architecture and engineering.">
+  <div class="container" style="padding-block: var(--space-6);">
+    <h1>Blog</h1>
+
+    {
+      page.data.length === 0 ? (
+        <p class="blog-empty">No posts published yet — check back soon.</p>
+      ) : (
+        <div class="post-list">
+          {page.data.map((post) => <PostCard post={post} />)}
+        </div>
+      )
+    }
+
+    <nav class="pagination" aria-label="Blog pagination">
+      {page.url.prev && <a href={page.url.prev}>&larr; Newer posts</a>}
+      {page.url.next && <a href={page.url.next}>Older posts &rarr;</a>}
+    </nav>
+  </div>
+</BaseLayout>
+
+<style>
+  .blog-empty {
+    color: var(--color-text-muted);
+    padding-block: var(--space-5);
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--space-5);
+  }
+</style>
