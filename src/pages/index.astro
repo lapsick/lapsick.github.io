@@ -20,7 +20,7 @@ import { profile } from '../data/profile';
     <div class="hero__actions">
       <a class="button button--primary" href="/about">View experience</a>
       <a class="button" href="/blog">Read the blog</a>
-      <a class="button" href="/contact">Get in touch</a>
+      <a class="button" href={`mailto:${profile.email}`}>Get in touch</a>
     </div>
 
     <div class="hero__external">

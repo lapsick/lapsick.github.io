@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { profile } from '../data/profile';
+
+const typeLabels: Record<string, string> = {
+  talk: 'Talk',
+  article: 'Article',
+  podcast: 'Podcast',
+  other: 'Writing',
+};
+
+function formatDate(value?: string): string {
+  if (!value) return '';
+  const [year, month] = value.split('-');
+  if (!month) return year;
+  const date = new Date(Number(year), Number(month) - 1);
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+
+const sorted = [...profile.talks].sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
+---
+
+<BaseLayout
+  title={`Talks & Writing — ${profile.name}`}
+  description={`Conference talks, external articles, and other writing by ${profile.name}.`}
+>
+  <div class="container prose" style="padding-block: var(--space-6);">
+    <h1>Talks & Writing</h1>
+
+    {
+      sorted.length === 0 ? (
+        <p class="talks-empty">
+          Nothing published here yet — check the <a href="/blog">blog</a> for shorter, regularly
+          updated writing in the meantime.
+        </p>
+      ) : (
+        <ul class="talks-list">
+          {sorted.map((item) => (
+            <li>
+              <span class="talks-list__type">{typeLabels[item.type]}</span>
+              <h2>
+                {item.url ? (
+                  <a href={item.url} target="_blank" rel="noopener noreferrer">
+                    {item.title}
+                  </a>
+                ) : (
+                  item.title
+                )}
+              </h2>
+              <p class="talks-list__meta">
+                {item.venue}
+                {item.venue && item.date && ' · '}
+                {formatDate(item.date)}
+              </p>
+              {item.description && <p>{item.description}</p>}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .talks-empty {
+    color: var(--color-text-muted);
+    padding-block: var(--space-4);
+  }
+
+  .talks-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .talks-list li {
+    padding-block: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .talks-list h2 {
+    margin: var(--space-1) 0;
+  }
+
+  .talks-list__type {
+    display: inline-block;
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: var(--space-1) var(--space-3);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-text-muted);
+  }
+
+  .talks-list__meta {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin: 0 0 var(--space-2);
+  }
+</style>

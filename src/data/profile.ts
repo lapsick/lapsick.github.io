@@ -36,6 +36,16 @@ export interface Language {
   level: string;
 }
 
+export interface TalkOrArticle {
+  title: string;
+  type: 'talk' | 'article' | 'podcast' | 'other';
+  venue?: string;
+  /** YYYY or YYYY-MM */
+  date?: string;
+  url?: string;
+  description?: string;
+}
+
 export interface Profile {
   name: string;
   title: string;
@@ -60,6 +70,8 @@ export interface Profile {
   /** Newest first. */
   experience: ExperienceEntry[];
   education: EducationEntry[];
+  /** Newest first. Talks, conference sessions, external articles, podcasts. */
+  talks: TalkOrArticle[];
 }
 
 export const profile: Profile = {
@@ -303,8 +315,11 @@ export const profile: Profile = {
   education: [
     {
       institution: 'Ivan Franko National University of Lviv',
-      qualification: "Bachelor's Degree",      
+      qualification: "Bachelor's Degree",
       endDate: '2005',
     },
   ],
+  // No talks or external articles supplied yet — the page renders a clean
+  // empty state until real entries are added here.
+  talks: [],
 };
