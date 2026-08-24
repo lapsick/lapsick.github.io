@@ -79,8 +79,8 @@ export const profile: Profile = {
     'solutions incorporating applied AI (LLMs, RAG, Agentic AI) for decision support and ' +
     'automation. Comfortable across cloud (Azure, AWS) and on-premise / restricted-network ' +
     'deployments.',
-  photo: '/images/profile-photo.svg',
-  photoAlt: 'Portrait placeholder for Roman Mykhailovych',
+  photo: '/images/roman-portrait.jpg',
+  photoAlt: 'Portrait of Roman Mykhailovych',
   email: 'rmyhaylovych@msn.com',
   githubUrl: 'https://github.com/lapsick',
   linkedinUrl: 'https://www.linkedin.com/in/roman-mykhailovych/',
