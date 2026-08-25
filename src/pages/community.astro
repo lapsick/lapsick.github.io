@@ -57,6 +57,13 @@ function isUpcoming(sortDate: string): boolean {
                 {item.date}
               </p>
               {item.description && <p>{item.description}</p>}
+              {item.certificateUrl && (
+                <p class="events-list__cert">
+                  <a href={item.certificateUrl} target="_blank" rel="noopener noreferrer">
+                    View certificate
+                  </a>
+                </p>
+              )}
             </li>
           ))}
         </ul>
@@ -118,5 +125,10 @@ function isUpcoming(sortDate: string): boolean {
     color: var(--color-text-muted);
     font-size: 0.9rem;
     margin: 0 0 var(--space-2);
+  }
+
+  .events-list__cert {
+    font-size: 0.9rem;
+    margin: var(--space-2) 0 0;
   }
 </style>

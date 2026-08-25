@@ -16,7 +16,21 @@ function isActive(href: string) {
 
 <header class="site-nav">
   <div class="container site-nav__inner">
-    <a class="site-nav__brand" href="/">To Boldly Ship Where No One Has Shipped Before.</a>
+    <div class="site-nav__brand-group">
+      <svg
+        class="site-nav__flag"
+        viewBox="0 0 3 2"
+        width="24"
+        height="16"
+        role="img"
+        aria-label="Flag of Ukraine"
+      >
+        <title>Glory to Ukraine!</title>
+        <rect width="3" height="1" fill="#0057B7"></rect>
+        <rect width="3" height="1" y="1" fill="#FFD700"></rect>
+      </svg>
+      <a class="site-nav__brand" href="/">To Boldly Ship Where No One Has Shipped Before.</a>
+    </div>
     <nav aria-label="Primary">
       <ul class="site-nav__links">
         {
@@ -45,6 +59,19 @@ function isActive(href: string) {
     justify-content: space-between;
     gap: var(--space-2) var(--space-3);
     padding-block: var(--space-3);
+  }
+
+  .site-nav__brand-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .site-nav__flag {
+    flex-shrink: 0;
+    display: block;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px var(--color-border);
   }
 
   .site-nav__brand {

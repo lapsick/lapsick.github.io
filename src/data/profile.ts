@@ -47,6 +47,7 @@ export interface CommunityEvent {
   sortDate: string;
   url?: string;
   description?: string;
+  certificateUrl?: string;
 }
 
 export interface Profile {
@@ -344,6 +345,14 @@ export const profile: Profile = {
       url: 'https://fwdays.com/en/event/agentic-engineering-course',
     },
     {
+      title: 'Building with the Claude API (Anthropic)',
+      type: 'course',
+      location: 'Online',
+      date: 'Aug 2026',
+      sortDate: '2026-08-01',
+      url: 'https://verify.skilljar.com/c/ybb87upabv97',
+    },
+    {
       title: 'Fwdays AI Summit',
       type: 'conference',
       location: 'Kyiv',
@@ -361,6 +370,7 @@ export const profile: Profile = {
       date: 'Mar 26, 2026',
       sortDate: '2026-03-26',
       url: 'https://fwdays.com/en/event/rules-ide-course',
+      certificateUrl: 'https://study.fwdays.com/uk/verifycertificate/?uuid=59d573e2-483a-40ff-ad8e-9187255dcacd',
     },
     {
       title: "Software Architecture fwdays'25",
@@ -425,6 +435,14 @@ export const profile: Profile = {
       date: 'Aug 3–12, 2021',
       sortDate: '2021-08-03',
       url: 'https://fwdays.com/en/event/dotnet-fwdays-2021',
+    },
+    {
+      title: 'Machine Learning (Stanford Online)',
+      type: 'course',
+      location: 'Online',
+      date: 'Nov 2020',
+      sortDate: '2020-11-01',
+      url: 'https://www.coursera.org/account/accomplishments/verify/PZLK9MQFXC5A?utm_source=link&utm_medium=certificate&utm_content=cert_image&utm_campaign=pdf_header_button&utm_product=course',
     },
   ],
 };
