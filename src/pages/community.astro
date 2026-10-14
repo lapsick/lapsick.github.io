@@ -13,9 +13,9 @@ const typeLabels: Record<string, string> = {
 
 const sorted = [...profile.communityEvents].sort((a, b) => b.sortDate.localeCompare(a.sortDate));
 
-// Computed at build time from today's date, not a manually-set flag — the
-// label correctly stops showing "Upcoming" on its own once the site is
-// next rebuilt after the event's start date passes.
+// Computed at build time from today's date, not a manually-set flag. The
+// static build can go stale between deploys, so the inline script below
+// re-checks each badge against the visitor's date and drops past ones.
 const today = new Date().toISOString().slice(0, 10);
 function isUpcoming(sortDate: string): boolean {
   return sortDate > today;
@@ -41,7 +41,11 @@ function isUpcoming(sortDate: string): boolean {
           {sorted.map((item) => (
             <li>
               <span class="events-list__type">{typeLabels[item.type]}</span>
-              {isUpcoming(item.sortDate) && <span class="events-list__upcoming">Upcoming</span>}
+              {isUpcoming(item.sortDate) && (
+                <span class="events-list__upcoming" data-start={item.sortDate}>
+                  Upcoming
+                </span>
+              )}
               <h2>
                 {item.url ? (
                   <a href={item.url} target="_blank" rel="noopener noreferrer">
@@ -71,6 +75,18 @@ function isUpcoming(sortDate: string): boolean {
     }
   </div>
 </BaseLayout>
+
+<script is:inline>
+  (() => {
+    const d = new Date();
+    const today = [d.getFullYear(), d.getMonth() + 1, d.getDate()]
+      .map((n) => String(n).padStart(2, '0'))
+      .join('-');
+    document.querySelectorAll('.events-list__upcoming[data-start]').forEach((el) => {
+      if (el.dataset.start <= today) el.remove();
+    });
+  })();
+</script>
 
 <style>
   .events-empty {

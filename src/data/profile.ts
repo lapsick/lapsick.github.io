@@ -343,6 +343,7 @@ export const profile: Profile = {
       date: 'Sep 8–24, 2026',
       sortDate: '2026-09-08',
       url: 'https://fwdays.com/en/event/agentic-engineering-course',
+      certificateUrl: 'https://study.fwdays.com/uk/verifycertificate/?uuid=3ec87247-a4a1-42ac-8e47-d3245c91e0e4',
     },
     {
       title: 'Building with the Claude API (Anthropic)',
