@@ -327,6 +327,16 @@ export const profile: Profile = {
   // on CommunityEvent. Add real talks/articles here too when there are any.
   communityEvents: [
     {
+      // Online webinar attended, not presented — so 'other' rather than
+      // 'talk' (which is reserved for talks given).
+      title: 'ABP Community Talks 2026.06: ABP AI Coding Agent for Every .NET Developer',
+      type: 'other',
+      location: 'Online',
+      date: 'Oct 15, 2026',
+      sortDate: '2026-10-15',
+      url: 'https://kommunity.com/volosoft/events/abp-community-talks-202606-abp-ai-coding-agent-for-every-net-developer-3d95c2ca',
+    },
+    {
       // No city/mode given — left unset rather than guessed.
       title: 'Fwdays Tech Summit',
       type: 'conference',
