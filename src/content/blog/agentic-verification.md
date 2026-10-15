@@ -35,5 +35,3 @@ them instead of fixing the problem.
 
 So our job is shifting from reviewing every line to building verification loops and defining
 what success looks like before any code is written.
-
-Are you already building these loops for your agents, or still checking everything by hand?
