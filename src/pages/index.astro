@@ -11,6 +11,7 @@ import { profile } from '../data/profile';
     {profile.photo && <img class="hero__photo" src={profile.photo} alt={profile.photoAlt ?? ''} width="120" height="120" />}
     <p class="hero__eyebrow">{profile.title}</p>
     <h1>{profile.name}</h1>
+    <a class="hero__availability" href="/contact">Open to work · Miltech</a>
     <p class="hero__summary">{profile.summary}</p>
 
     <ul class="hero__skills">
@@ -20,7 +21,7 @@ import { profile } from '../data/profile';
     <div class="hero__actions">
       <a class="button button--primary" href="/about">View experience</a>
       <a class="button" href="/blog">Read the blog</a>
-      <a class="button" href={`mailto:${profile.email}`}>Get in touch</a>
+      <a class="button" href="/contact">Get in touch</a>
     </div>
 
     <div class="hero__external">
@@ -53,6 +54,34 @@ import { profile } from '../data/profile';
   .hero h1 {
     font-size: clamp(2rem, 5vw, 3rem);
     margin: 0 0 var(--space-3);
+  }
+
+  .hero__availability {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    max-width: 100%;
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--color-accent);
+    border-radius: 999px;
+    background: var(--color-bg-subtle);
+    color: var(--color-accent);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .hero__availability::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .hero__availability:hover {
+    text-decoration: underline;
   }
 
   .hero__summary {

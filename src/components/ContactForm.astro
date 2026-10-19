@@ -1,162 +1,111 @@
 ---
 interface Props {
-  values?: { name?: string; email?: string; company?: string; message?: string };
-  errors?: Partial<Record<'name' | 'email' | 'company' | 'message', string>>;
-  submitFailed?: boolean;
-  fallbackEmail?: string;
+  endpoint: string;
 }
 
-const { values = {}, errors = {}, submitFailed = false, fallbackEmail } = Astro.props;
-const renderedAt = Date.now();
+const { endpoint } = Astro.props;
 ---
 
-<form method="post" action="/api/contact" novalidate class="contact-form" id="contact-form">
-  {
-    submitFailed && (
-      <p class="form-status form-status--error" role="alert">
-        We couldn't send your message.
-        {fallbackEmail && (
-          <>
-            {' '}
-            Please email <a href={`mailto:${fallbackEmail}`}>{fallbackEmail}</a> directly.
-          </>
-        )}
-      </p>
-    )
-  }
-
+<form method="post" action={endpoint} class="contact-form" id="contact-form">
   <div class="field">
     <label for="name">Name</label>
-    <input
-      type="text"
-      id="name"
-      name="name"
-      value={values.name ?? ''}
-      required
-      maxlength="100"
-      aria-describedby={errors.name ? 'name-error' : undefined}
-      aria-invalid={errors.name ? 'true' : undefined}
-    />
-    {errors.name && <p id="name-error" class="field-error">{errors.name}</p>}
+    <input type="text" id="name" name="name" required maxlength="100" autocomplete="name" />
   </div>
 
   <div class="field">
     <label for="email">Email</label>
-    <input
-      type="email"
-      id="email"
-      name="email"
-      value={values.email ?? ''}
-      required
-      maxlength="254"
-      aria-describedby={errors.email ? 'email-error' : undefined}
-      aria-invalid={errors.email ? 'true' : undefined}
-    />
-    {errors.email && <p id="email-error" class="field-error">{errors.email}</p>}
+    <input type="email" id="email" name="email" required maxlength="254" autocomplete="email" />
   </div>
 
   <div class="field">
     <label for="company">Company <span class="field-optional">(optional)</span></label>
-    <input
-      type="text"
-      id="company"
-      name="company"
-      value={values.company ?? ''}
-      maxlength="100"
-      aria-describedby={errors.company ? 'company-error' : undefined}
-      aria-invalid={errors.company ? 'true' : undefined}
-    />
-    {errors.company && <p id="company-error" class="field-error">{errors.company}</p>}
+    <input type="text" id="company" name="company" maxlength="100" autocomplete="organization" />
   </div>
 
   <div class="field">
     <label for="message">Message</label>
-    <textarea
-      id="message"
-      name="message"
-      rows="6"
-      required
-      maxlength="5000"
-      aria-describedby={errors.message ? 'message-error' : undefined}
-      aria-invalid={errors.message ? 'true' : undefined}
-    >{values.message ?? ''}</textarea>
-    {errors.message && <p id="message-error" class="field-error">{errors.message}</p>}
+    <textarea id="message" name="message" rows="6" required maxlength="5000"></textarea>
   </div>
 
-  <!-- Honeypot: hidden from sighted users and from assistive technology. Real
-       visitors never fill this in; anything present here is treated as spam. -->
   <div class="field field--honeypot" aria-hidden="true">
-    <label for="_hp">Leave this field empty</label>
-    <input type="text" id="_hp" name="_hp" tabindex="-1" autocomplete="off" />
+    <label for="_gotcha">Leave this field empty</label>
+    <input type="text" id="_gotcha" name="_gotcha" tabindex="-1" autocomplete="off" />
   </div>
-  <input type="hidden" name="_t" value={renderedAt} />
-
   <button type="submit" class="button button--primary">Send message</button>
 </form>
 
 <p class="contact-form__privacy">
-  Submitting this form sends your message directly to the site owner by email. Nothing you enter
-  is stored on this site.
+  Your name, email, company (if provided), and message are sent to Formspree for processing
+  and email delivery. Formspree may store submissions and process data to prevent spam.
+  See <a href="https://formspree.io/legal/privacy-policy/" target="_blank" rel="noopener noreferrer">Formspree’s privacy policy</a>.
 </p>
 
 <script>
-  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  import { validateContact } from '../lib/validate';
+
+  const form = document.querySelector<HTMLFormElement>('#contact-form');
   if (form) {
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const formData = new FormData(form);
-      const payload = Object.fromEntries(formData.entries());
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    let submitting = false;
 
-      let statusEl = form.querySelector<HTMLElement>('.form-status');
-      statusEl?.remove();
-      form.querySelectorAll('.field-error').forEach((el) => el.remove());
-
-      try {
-        const res = await fetch('/api/contact', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-
-        if (res.ok && data.ok) {
-          form.outerHTML =
-            '<p class="form-status form-status--success" role="status">Thanks — your message has been sent.</p>';
-          return;
-        }
-
-        if (res.status === 400 && data.errors) {
-          for (const [field, msg] of Object.entries<string>(data.errors)) {
-            const input = form.querySelector(`[name="${field}"]`);
-            if (input) {
-              const p = document.createElement('p');
-              p.className = 'field-error';
-              p.textContent = msg;
-              input.insertAdjacentElement('afterend', p);
-            }
-          }
-          return;
-        }
-
-        const p = document.createElement('p');
-        p.className = 'form-status form-status--error';
-        p.setAttribute('role', 'alert');
-        p.textContent =
-          data.message ||
-          "We couldn't send your message. Please try again or email us directly.";
-        form.insertAdjacentElement('beforebegin', p);
-      } catch {
-        const p = document.createElement('p');
-        p.className = 'form-status form-status--error';
-        p.setAttribute('role', 'alert');
-        p.textContent = "We couldn't send your message. Please try again or email us directly.";
-        form.insertAdjacentElement('beforebegin', p);
+    form.addEventListener('submit', (event) => {
+      if (submitting) {
+        event.preventDefault();
+        return;
       }
+      form.querySelectorAll('.field-error').forEach((el) => el.remove());
+      form.querySelectorAll('[aria-invalid]').forEach((el) => {
+        el.removeAttribute('aria-invalid');
+        el.removeAttribute('aria-describedby');
+      });
+
+      const fields = new FormData(form);
+      const result = validateContact({
+        name: fields.get('name'), email: fields.get('email'),
+        company: fields.get('company'), message: fields.get('message'),
+      });
+      if (!result.ok) {
+        event.preventDefault();
+        for (const [field, message] of Object.entries(result.errors)) {
+          const input = form.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[name="${field}"]`);
+          if (!input) continue;
+          const error = document.createElement('p');
+          error.id = `${field}-error`;
+          error.className = 'field-error';
+          error.textContent = message;
+          input.setAttribute('aria-invalid', 'true');
+          input.setAttribute('aria-describedby', error.id);
+          input.insertAdjacentElement('afterend', error);
+        }
+        form.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+        return;
+      }
+      for (const [key, value] of Object.entries(result.value)) {
+        const input = form.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[name="${key}"]`);
+        if (input) input.value = value;
+      }
+      // Use the native POST so Formspree can handle any CAPTCHA challenge and
+      // display its confirmation page, including when JavaScript is unavailable.
+      submitting = true;
+      button.disabled = true;
+      button.textContent = 'Sending…';
+      form.setAttribute('aria-busy', 'true');
+    });
+    // Restore the form when returning from Formspree with the browser Back button.
+    window.addEventListener('pageshow', () => {
+      submitting = false;
+      button.disabled = false;
+      button.textContent = 'Send message';
+      form.removeAttribute('aria-busy');
     });
   }
 </script>
 
 <style>
+  .button--primary:disabled {
+    opacity: 0.65;
+    cursor: wait;
+  }
   .contact-form {
     display: grid;
     gap: var(--space-4);

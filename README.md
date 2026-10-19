@@ -1,7 +1,7 @@
 # Portfolio
 
-A static personal portfolio and blog for a Software Engineer and Architect, with one dynamic
-feature: a contact form that emails submissions to the owner. Built with [Astro](https://astro.build).
+A static personal portfolio and blog for a Software Engineer and Architect. Contact submissions
+are handled by Formspree. Built with [Astro](https://astro.build).
 
 See [specs/001-portfolio-blog-site/](specs/001-portfolio-blog-site/) for the full specification,
 architecture plan, and task list this project was built from, and
@@ -11,36 +11,36 @@ constraints (Node.js only, no database, no automated tests, static by default).
 ## Prerequisites
 
 - **Node.js 22.12.0 or newer** (Astro 6's minimum). Check with `node -v`.
-- An SMTP account (any provider) and a `From` mailbox on a domain you control, with SPF/DKIM
-  configured — see [Email delivery](#email-delivery) below.
+- A Formspree account and form endpoint, if you want the contact form enabled.
 
 ## Setup
 
 ```powershell
 npm install
 Copy-Item .env.example .env
-# then edit .env with real SMTP credentials and addresses
+# Set PUBLIC_FORMSPREE_ENDPOINT to your Formspree form endpoint.
 ```
+
+Create a form at https://formspree.io, verify your destination inbox, and copy the
+`https://formspree.io/f/<form-id>` endpoint from its Integration tab into `.env`:
+
+```dotenv
+PUBLIC_FORMSPREE_ENDPOINT=https://formspree.io/f/your-form-id
+```
+
+Use your actual endpoint, not the example above. The endpoint is public and is not an API key.
+Restart the dev server after changing `.env`. For deployment, set the same variable in your
+build environment and rebuild: the endpoint is embedded into the static Contact page at build time.
+Without an endpoint, Contact shows direct email and LinkedIn links instead of a broken form.
 
 ## Commands
 
 | Command | Purpose |
 |---|---|
 | `npm run dev` | Local dev server at `http://localhost:4321` |
-| `npm run check` | Type-check + content schema validation (`astro check`) |
-| `npm run build` | Production build to `dist/` |
-| `npm run preview` | Serve the built output via Astro's preview server |
-| `npm start` | Run the built standalone Node server directly |
-
-The standalone server does **not** auto-load `.env` — Node 22+ supports loading it natively:
-
-```powershell
-node --env-file=.env dist/server/entry.mjs
-```
-
-For any other host or process manager, provide the variables in `.env.example` as real environment
-variables however that platform expects (shell export, systemd `EnvironmentFile`, a platform's
-secrets/env UI, etc).
+| `npm run check` | Type-check and content schema validation |
+| `npm run build` | Generate the static site in `dist/` |
+| `npm run preview` / `npm start` | Preview the generated site locally |
 
 ## Writing and publishing a blog post
 
@@ -79,39 +79,38 @@ exist under `public/`) fails the build with a message naming the file — see
 
 Edit `src/data/profile.ts` directly — it's plain TypeScript, validated by `npm run check`.
 
-> **The committed `profile.ts` currently holds placeholder content**, not the real owner's LinkedIn
-> profile. Replace `name`, `title`, `summary`, `email`, `githubUrl`, `linkedinUrl`, `skills`,
-> `experience`, and `education` before deploying — see the specification's Assumptions section on
-> why this is manual rather than a live LinkedIn integration.
+## Contact delivery
 
-## Email delivery
+The Contact page posts directly to Formspree; there is no `/api/contact` backend and no SMTP
+configuration. JavaScript adds pending state and trimmed field validation. The native form posts
+to Formspree's hosted response page, where CAPTCHA challenges and confirmation are handled.
+The same submission flow works without JavaScript.
+An always-visible email link offers a fallback if delivery fails.
 
-The contact form (`src/pages/contact.astro` + `src/pages/api/contact.ts`) sends mail via
-[Nodemailer](https://nodemailer.com) over SMTP. Two things that are easy to get wrong:
+Spam filtering and submission limits are handled by Formspree. The form includes its `_gotcha`
+honeypot. Configure additional spam protection in your Formspree dashboard.
+Submissions are processed and may be stored by Formspree; the page includes its privacy policy.
 
-- **`SMTP_FROM` must be a mailbox on a domain you control**, never the visitor's address — putting
-  their address in `From` is sender spoofing and gets rejected or spam-filed by DMARC. The visitor's
-  address goes in `Reply-To` instead, which is what makes "Reply" in your mail client address them.
-- **Configure SPF and DKIM** for the sending domain before relying on this in production, then send
-  a real test message to both a Gmail and an Outlook address to confirm it lands in the inbox, not
-  spam.
+Manual verification: check required fields and invalid email handling; confirm the endpoint in the
+rendered form; send a message to your own configured form, confirm Formspree's confirmation page
+and inbox receipt, and verify replies address the visitor. Check the browser Back button restores
+the form for retry after a delivery error.
+Live delivery can only be verified with an activated form and verified destination inbox.
 
 ## Deployment
 
-Build and run one Node process; nothing else is required:
-
 ```powershell
+npm run check
 npm run build
-node --env-file=.env dist/server/entry.mjs
 ```
 
-If a deploy fails partway, the previously deployed `dist/` must remain in place and serving — don't
-replace it until the new build has succeeded end-to-end (see the constitution's Development
-Workflow).
+Publish `dist/` to static hosting, including GitHub Pages. No Node server or SMTP secrets are
+needed in production. Supply `PUBLIC_FORMSPREE_ENDPOINT` during the build. A failed deployment
+must leave the previously published site intact.
 
-## What's deliberately absent
+## Architecture note
 
-Per the project constitution: no test framework or test suite (verification is the manual pass in
-[specs/001-portfolio-blog-site/quickstart.md](specs/001-portfolio-blog-site/quickstart.md)), no
-database, no runtime other than Node.js, and no page or endpoint beyond the contact flow that
-executes at request time — every other page is prerendered static HTML.
+The Formspree migration supersedes the original SMTP/contact-endpoint design in the initial
+feature documents. The application stores no submissions and has no runtime endpoints. The
+original specification and plan remain as historical design records. No test framework or test
+suite is included; changes are verified manually and with Astro's checks and production build.

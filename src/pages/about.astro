@@ -10,7 +10,16 @@ import { profile } from '../data/profile';
 >
   <div class="container prose" style="padding-block: var(--space-6);">
     <h1>About</h1>
-    <p>{profile.about}</p>
+    {
+      profile.resumePdf && (
+        <p>
+          <a class="button button--primary" href={profile.resumePdf} download>
+            Download résumé (PDF)
+          </a>
+        </p>
+      )
+    }
+    <p>{profile.about} <strong>{profile.careerObjective}</strong></p>
 
     {
       profile.focusAreas.length > 0 && (
@@ -105,6 +114,16 @@ import { profile } from '../data/profile';
 </BaseLayout>
 
 <style>
+  .button--primary {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius);
+    background: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent-contrast);
+    text-decoration: none;
+  }
+
   .focus-areas {
     padding-left: 1.25rem;
   }

@@ -57,6 +57,7 @@ export interface Profile {
   summary: string;
   /** Longer-form introduction for the About page. */
   about: string;
+  careerObjective: string;
   photo?: string;
   photoAlt?: string;
   email: string;
@@ -95,6 +96,9 @@ export const profile: Profile = {
     'solutions incorporating applied AI (LLMs, RAG, Agentic AI) for decision support and ' +
     'automation. Comfortable across cloud (Azure, AWS) and on-premise / restricted-network ' +
     'deployments.',
+  careerObjective:
+    'Seeking opportunities to apply my software engineering and architecture ' +
+    'expertise in the deftech industry.',
   photo: '/images/roman-portrait.jpg',
   photoAlt: 'Portrait of Roman Mykhailovych',
   email: 'rmyhaylovych@msn.com',
