@@ -10,8 +10,10 @@ import { profile } from '../data/profile';
   <section class="container hero">
     {profile.photo && <img class="hero__photo" src={profile.photo} alt={profile.photoAlt ?? ''} width="120" height="120" />}
     <p class="hero__eyebrow">{profile.title}</p>
-    <h1>{profile.name}</h1>
-    <a class="hero__availability" href="/contact">Open to work · Miltech</a>
+    <div class="hero__heading">
+      <h1>{profile.name}</h1>
+      <a class="hero__availability" href="/contact"><span>Open to work in <span aria-hidden="true">🪖</span> Miltech</span></a>
+    </div>
     <p class="hero__summary">{profile.summary}</p>
 
     <ul class="hero__skills">
@@ -37,6 +39,21 @@ import { profile } from '../data/profile';
     max-width: var(--measure);
   }
 
+  .hero__heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+
+  @media (min-width: 52rem) {
+    .hero__heading {
+      width: max-content;
+      max-width: calc((100vw + var(--measure)) / 2 - 2 * var(--space-3));
+    }
+  }
+
   .hero__photo {
     border-radius: 50%;
     margin-bottom: var(--space-3);
@@ -53,7 +70,7 @@ import { profile } from '../data/profile';
 
   .hero h1 {
     font-size: clamp(2rem, 5vw, 3rem);
-    margin: 0 0 var(--space-3);
+    margin: 0;
   }
 
   .hero__availability {
