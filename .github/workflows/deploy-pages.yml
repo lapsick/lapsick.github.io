@@ -27,6 +27,7 @@ jobs:
       - run: npm run build
         env:
           PUBLIC_FORMSPREE_ENDPOINT: ${{ vars.PUBLIC_FORMSPREE_ENDPOINT }}
+          PUBLIC_GOATCOUNTER_ENDPOINT: ${{ vars.PUBLIC_GOATCOUNTER_ENDPOINT }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

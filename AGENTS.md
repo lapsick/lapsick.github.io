@@ -1,70 +1,81 @@
 # AGENTS.md
 
-This file provides guidance to Codex (claude.ai/code) when working with code in this repository.
+Guidance for coding agents working in this repository.
 
-## What this repository is
+## Project
 
-This is a **GitHub Spec Kit** project scaffolded for **Spec-Driven Development (SDD)**. There is **no application code yet** — only the `.specify/` tooling and the `.Codex/skills/speckit-*` commands that drive the SDD workflow. The eventual product is a "portfolio" (the directory name); its stack, structure, and constitution are still to be defined through the workflow below.
+This is an implemented personal portfolio and blog built with Astro 6 and TypeScript.
+It is a Git repository. Pages are generated as static assets and deployed to GitHub Pages.
+Contact submissions go directly to Formspree; there is no application backend.
 
-Do not invent an application architecture. Real product structure appears only after a feature is specified and planned. When starting real work, run the workflow rather than hand-creating `specs/` or source directories.
+The Spec Kit skills and tooling have been removed. Work directly in the existing codebase.
+Do not require slash commands, feature numbering, feature state files, or generated specs,
+plans and task lists before making changes. Existing `specs/` documents are historical
+context; the current implementation and these instructions guide new work.
 
-Key facts (from `.specify/init-options.json` / `.specify/integration.json`):
-- Integration: `Codex`; command invoke separator is `-`, so skills are called as `/speckit-specify`, `/speckit-plan`, etc.
-- Scripts: PowerShell (`ps`) under `.specify/scripts/powershell/`. There are no bash equivalents installed here.
-- Feature numbering: `sequential` (e.g. `001-`, `002-`).
-- This directory is **not a git repository**. Feature "branches" are directory names under `specs/`, not real git branches — feature state is tracked in files, not by git (see below).
+## Structure
 
-## The SDD workflow
+- `src/pages/`: Astro routes, including the blog, tag pages, contact page and RSS feed.
+- `src/layouts/`: Shared page markup and metadata in `BaseLayout.astro`; blog layout in `PostLayout.astro`.
+- `src/components/`: Reusable Astro components, including navigation and the contact form.
+- `src/styles/global.css`: Shared styling.
+- `src/data/profile.ts`: Profile, experience and contact information.
+- `src/content/blog/`: Markdown blog posts.
+- `src/content.config.ts`: Blog frontmatter schema.
+- `src/lib/posts.ts`: Published-post loading and validation.
+- `public/`: Static assets copied into the build.
+- `astro.config.mjs`: Static output, canonical site URL and sitemap integration.
+- `.github/workflows/deploy-pages.yml`: Build and GitHub Pages deployment.
+- `README.md`: Setup, content authoring and deployment instructions.
 
-Features flow through this pipeline, each stage a skill invoked as a slash command.
+Do not edit generated `dist/`, `.astro/` or installed `node_modules/` files.
 
-1. `/speckit-constitution` — fill in `.specify/memory/constitution.md` (currently an unfilled template). Establishes project-wide principles that later stages must honor.
-2. `/speckit-specify "<description>"` — creates `specs/NNN-<short-name>/spec.md` from the spec template. This is the entry point for any new feature.
-3. `/speckit-clarify` — (optional) asks up to 5 targeted questions and writes answers back into the spec.
-4. `/speckit-plan` — generates `plan.md` and design docs (`research.md`, `data-model.md`, `contracts/`, `quickstart.md`) in the feature directory.
-5. `/speckit-tasks` — generates a dependency-ordered `tasks.md`.
-6. `/speckit-analyze` — (optional) non-destructive consistency check across spec/plan/tasks.
-7. `/speckit-implement` — executes `tasks.md`.
+## Development
 
-Support skills: `/speckit-checklist` (custom quality checklists), `/speckit-converge` (reconcile codebase against spec/plan/tasks, appending remaining work to `tasks.md`), `/speckit-taskstoissues` (export tasks as GitHub issues).
-
-Each skill's `SKILL.md` in `.Codex/skills/` begins by running a PowerShell script (below) to resolve paths and prerequisites, then acts on the returned JSON. Follow the SKILL.md rather than reimplementing its steps.
-
-## Feature state (important, non-obvious)
-
-Because there are no git branches, the "current feature" is resolved by the scripts in this priority order (see `common.ps1` → `Get-FeaturePathsEnv`):
-1. `$env:SPECIFY_FEATURE_DIRECTORY` (explicit override), or `$env:SPECIFY_FEATURE`
-2. `.specify/feature.json` (the persisted `feature_directory`, written by `/speckit-specify`)
-3. Otherwise the scripts error out asking you to run specify first.
-
-`create-new-feature.ps1` sets those env vars for its own session and persists `feature.json`. In a **fresh** Codex session the env vars are gone, so path-resolving scripts rely on `feature.json`. To operate on a specific existing feature without re-running specify, set `$env:SPECIFY_FEATURE_DIRECTORY` (e.g. `specs/001-foo`) before invoking a skill.
-
-## Scripts (invoke via `pwsh`, not bash)
-
-All live in `.specify/scripts/powershell/`. They print human text by default and machine JSON with `-Json`; the skills call them with `-Json`.
+Use Node.js 22.12.0 or newer and npm. The local shell is PowerShell.
 
 ```powershell
-# Create a feature dir + spec.md and set feature state
-.specify/scripts/powershell/create-new-feature.ps1 -Json "Add a projects gallery"
-.specify/scripts/powershell/create-new-feature.ps1 -Json -ShortName 'proj-gallery' "Add a projects gallery"
-
-# Resolve feature paths only (no side effects / no validation)
-.specify/scripts/powershell/check-prerequisites.ps1 -PathsOnly
-
-# Gate for the plan phase (requires plan.md); add -RequireTasks -IncludeTasks for implement phase
-.specify/scripts/powershell/check-prerequisites.ps1 -Json
-.specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks
-
-.specify/scripts/powershell/setup-plan.ps1 -Json    # copy plan template into the feature dir
-.specify/scripts/powershell/setup-tasks.ps1 -Json   # resolve tasks template + available docs
+npm install
+npm run dev       # Local development at http://localhost:4321
+npm run check     # Astro/TypeScript and content checks
+npm run build     # Generate dist/
+npm run preview   # Preview the production build
 ```
 
-Any script accepts `-Help`. There is no build/lint/test tooling in the repo yet — that gets introduced by the first feature's plan.
+For code changes, run `npm run check` and `npm run build`, then manually verify the
+changed behavior in a local preview. Record what was verified and any external behavior
+that still needs an account, credentials or a deployment. Documentation-only changes
+need a content and diff review rather than a build.
 
-## Repo-root resolution
+## Implementation principles
 
-Scripts locate the project by walking upward for the `.specify/` directory (`Find-SpecifyRoot` in `common.ps1`), **not** for `.git`. `$env:SPECIFY_INIT_DIR` can override this for CI/monorepo use. Keep `.specify/` at the intended project root.
+- Keep the site static and compatible with GitHub Pages. Use Node.js for application
+  build tooling and any future server-side code; do not introduce a server or runtime
+  endpoint without an explicit requirement.
+- Do not add an application database or persist runtime visitor/contact state in the
+  application. Hosted integrations may manage their own data; document their setup.
+- Do not add automated test suites, runners or testing dependencies. Use the existing
+  checks, production build and manual verification.
+- Prefer small, readable changes and existing Astro components over new abstractions
+  or packages. Justify new dependencies with a current requirement.
+- Preserve accessible navigation, semantic markup, responsive layouts and usable
+  fallbacks when optional services or browser JavaScript are unavailable.
+- Keep secrets in environment variables and out of committed files. Variables prefixed
+  `PUBLIC_` are exposed to browsers and must never contain secrets.
+- Document new configuration in `.env.example` and `README.md`. Build-time settings
+  used in production must also be wired into the deployment workflow.
+- Preserve unrelated local changes. Do not deploy or push unless the user requests it.
 
-## Templates and the override stack
+## Content and integrations
 
-Stage output is generated from templates in `.specify/templates/` (`spec-template.md`, `plan-template.md`, `tasks-template.md`, `checklist-template.md`, `constitution-template.md`). Template resolution (`Resolve-Template` / `Resolve-TemplateContent` in `common.ps1`) checks, in priority order: `templates/overrides/` → `.specify/presets/` → `.specify/extensions/` → core `templates/`. To customize generated specs/plans/tasks project-wide, add an override at `.specify/templates/overrides/<name>.md` rather than editing the core template. Preset composition (prepend/append/wrap strategies) requires Python 3 + PyYAML.
+Blog posts are authored as Markdown with frontmatter matching `src/content.config.ts`.
+Draft posts must stay out of published listings, feeds and generated pages. The build
+validates required fields, duplicate slugs and cover images; keep that validation intact.
+
+Contact uses `PUBLIC_FORMSPREE_ENDPOINT`. Without it, the page shows direct email and
+LinkedIn links. Keep the native form submission and non-JavaScript fallback working.
+Formspree handles delivery and spam filtering. Live delivery requires an activated form
+and a verified destination inbox; do not claim it was verified from a local build.
+
+Static deployment publishes `dist/`. Keep build and deploy stages separate so a failed
+build leaves the previously published site intact.

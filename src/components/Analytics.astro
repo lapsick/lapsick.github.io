@@ -1,0 +1,20 @@
+---
+// This public collection URL is not an account credential or dashboard access token.
+const endpoint = import.meta.env.PUBLIC_GOATCOUNTER_ENDPOINT?.trim() ?? '';
+const enabled = import.meta.env.PROD &&
+  /^https:\/\/[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.goatcounter\.com\/count$/i.test(endpoint);
+const productionHostname = Astro.site?.hostname;
+---
+
+{enabled && productionHostname && (
+  <script is:inline define:vars={{ endpoint, productionHostname }}>
+    // Production builds are also used for local and hosted previews.
+    if (window.location.hostname === productionHostname) {
+      const collector = document.createElement('script');
+      collector.async = true;
+      collector.src = 'https://gc.zgo.at/count.js';
+      collector.dataset.goatcounter = endpoint;
+      document.head.appendChild(collector);
+    }
+  </script>
+)}

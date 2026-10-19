@@ -3,10 +3,10 @@
 A static personal portfolio and blog for a Software Engineer and Architect. Contact submissions
 are handled by Formspree. Built with [Astro](https://astro.build).
 
-See [specs/001-portfolio-blog-site/](specs/001-portfolio-blog-site/) for the full specification,
-architecture plan, and task list this project was built from, and
-[.specify/memory/constitution.md](.specify/memory/constitution.md) for the project's non-negotiable
-constraints (Node.js only, no database, no automated tests, static by default).
+See [AGENTS.md](AGENTS.md) for current development guidance. The documents in
+[specs/001-portfolio-blog-site/](specs/001-portfolio-blog-site/) record the original design;
+Spec Kit tooling has been removed. The project stays static, uses Node.js build tooling,
+and has no application database or automated test suite.
 
 ## Prerequisites
 
@@ -44,9 +44,7 @@ Without an endpoint, Contact shows direct email and LinkedIn links instead of a 
 
 ## Writing and publishing a blog post
 
-Blog posts are Markdown files — there is no admin interface, login, or database (Constitution II
-and IV; see [specs/001-portfolio-blog-site/research.md](specs/001-portfolio-blog-site/research.md)
-R5 for why).
+Blog posts are Markdown files — there is no admin interface, login, or application database.
 
 1. Add a new file under `src/content/blog/`, e.g. `src/content/blog/my-new-post.md`.
 2. Give it frontmatter matching the schema in `src/content.config.ts`:
@@ -97,6 +95,49 @@ and inbox receipt, and verify replies address the visitor. Check the browser Bac
 the form for retry after a delivery error.
 Live delivery can only be verified with an activated form and verified destination inbox.
 
+## Private visitor analytics
+
+Optional [GoatCounter](https://www.goatcounter.com/) integration lets you see traffic in
+its hosted dashboard. No visitor data is stored by this application.
+
+1. Create a hosted GoatCounter account and register your production site domain.
+2. Copy the collection endpoint from its integration settings into `.env`:
+
+   ```dotenv
+   PUBLIC_GOATCOUNTER_ENDPOINT=https://your-account.goatcounter.com/count
+   ```
+
+   Use your actual endpoint. This URL is public; do not use an API key or dashboard access token.
+3. In GoatCounter's settings, set **Dashboard viewable by** to logged-in users. Leave
+   public visitor counters disabled. Check that a signed-out browser cannot read statistics.
+4. For GitHub Pages, add `PUBLIC_GOATCOUNTER_ENDPOINT` under repository **Settings →
+   Secrets and variables → Actions → Variables**. Rebuild and deploy to activate it.
+5. Sign in at `https://your-account.goatcounter.com` to see traffic and select a date range.
+
+Collection runs on pages using the shared layout, only in production builds and when
+the browser hostname matches `site` in `astro.config.mjs`. Keep that URL accurate if you
+change domains. Development, localhost and previews on other hostnames do not count.
+Blank or malformed endpoints disable collection. A valid endpoint uses the hosted
+`https://<account>.goatcounter.com/count` format. Self-hosted endpoints are not supported
+by this integration. Blocking the collector leaves the site usable.
+
+Counts start after activation; historical visits cannot be recovered. GoatCounter's
+session-based measurements are estimates, not exact lifetime counts of distinct people.
+Reloads and visits to different pages follow its session rules. Disabled JavaScript,
+blockers and network failures can suppress visits. See the provider's
+[integration guide](https://www.goatcounter.com/help/start),
+[session rules](https://www.goatcounter.com/help/sessions) and
+[dashboard visibility guidance](https://www.goatcounter.com/help/frame).
+
+Manual verification: confirm blank and malformed configuration emit no collector;
+confirm development emits none even with a configured endpoint. Build with a configured
+endpoint and preview locally: the hostname guard must prevent external requests. After
+deployment, visit the production home page and a blog post with analytics unblocked,
+check the browser Network panel for collection requests and confirm dashboard updates.
+Repeat with the collector blocked and verify navigation and contact remain usable.
+Live collection and private dashboard access require the owner's activated account and
+a deployment; local build checks alone do not verify them.
+
 ## Deployment
 
 ```powershell
@@ -105,7 +146,8 @@ npm run build
 ```
 
 Publish `dist/` to static hosting, including GitHub Pages. No Node server or SMTP secrets are
-needed in production. Supply `PUBLIC_FORMSPREE_ENDPOINT` during the build. A failed deployment
+needed in production. Supply `PUBLIC_FORMSPREE_ENDPOINT` and, optionally,
+`PUBLIC_GOATCOUNTER_ENDPOINT` during the build. A failed deployment
 must leave the previously published site intact.
 
 ## Architecture note
